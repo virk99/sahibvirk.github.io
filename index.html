@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sahib Virk — Video Editor & Motion Designer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --bg: #0a0a0b;
+    --surface: #141416;
+    --surface-2: #1c1c1f;
+    --border: #2a2a2e;
+    --text: #f2f2f0;
+    --muted: #8b8b90;
+    --orange: #ff6a39;
+    --teal: #2de0c4;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    overflow-x:hidden;
+  }
+
+  h1,h2,h3, .display{ font-family:'Space Grotesk', sans-serif; }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+
+  a{ color:inherit; text-decoration:none; }
+  ul{ list-style:none; }
+  button{ font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+
+  ::selection{ background:var(--orange); color:#0a0a0b; }
+
+  /* Grain overlay */
+  .grain{
+    position:fixed; inset:0; pointer-events:none; z-index:999;
+    opacity:0.035; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 48px;
+    backdrop-filter:blur(12px);
+    background:rgba(10,10,11,0.7);
+    border-bottom:1px solid var(--border);
+  }
+  .logo{ font-weight:700; font-size:18px; letter-spacing:0.5px; }
+  .logo span{ color:var(--orange); }
+  .nav-links{ display:flex; gap:36px; }
+  .nav-links a{ font-size:14px; color:var(--muted); transition:color .25s; position:relative; }
+  .nav-links a:hover{ color:var(--text); }
+  .nav-cta{
+    font-size:13px; padding:9px 18px; border:1px solid var(--border); border-radius:100px;
+    color:var(--text); transition:all .25s;
+  }
+  .nav-cta:hover{ border-color:var(--orange); background:rgba(255,106,57,0.08); }
+  .nav-toggle{ display:none; font-size:22px; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height:100vh; display:flex; flex-direction:column; justify-content:center;
+    padding:140px 48px 80px; position:relative;
+  }
+  .timecode-bar{
+    display:flex; align-items:center; gap:10px;
+    font-size:12px; color:var(--muted); letter-spacing:1px; margin-bottom:28px;
+  }
+  .rec-dot{
+    width:8px; height:8px; border-radius:50%; background:var(--orange);
+    animation:pulse 1.6s infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.25;} }
+
+  .hero h1{
+    font-size:clamp(42px, 8vw, 104px);
+    line-height:0.98;
+    font-weight:700;
+    letter-spacing:-2px;
+    max-width:1100px;
+  }
+  .hero h1 .accent{ color:var(--orange); }
+  .hero h1 .outline{
+    -webkit-text-stroke:1.5px var(--text);
+    color:transparent;
+  }
+
+  .hero-sub{
+    margin-top:28px; max-width:520px; color:var(--muted); font-size:17px; line-height:1.6;
+  }
+
+  .hero-actions{ margin-top:44px; display:flex; gap:16px; flex-wrap:wrap; }
+  .btn-primary{
+    background:var(--orange); color:#0a0a0b; padding:14px 28px; border-radius:100px;
+    font-weight:600; font-size:14px; transition:transform .2s, box-shadow .2s; display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 8px 24px rgba(255,106,57,0.35); }
+  .btn-outline{
+    border:1px solid var(--border); padding:14px 28px; border-radius:100px; font-size:14px; font-weight:500;
+    transition:border-color .2s;
+  }
+  .btn-outline:hover{ border-color:var(--teal); color:var(--teal); }
+
+  /* Scrubber timeline decoration */
+  .scrubber{
+    margin-top:90px; position:relative; height:52px; border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+    display:flex; align-items:center; overflow:hidden;
+  }
+  .scrubber-track{
+    display:flex; gap:0; white-space:nowrap; animation:scrollTrack 22s linear infinite;
+  }
+  .tick{ width:60px; flex-shrink:0; position:relative; height:52px; display:flex; align-items:center; justify-content:center;}
+  .tick::before{ content:''; position:absolute; left:0; top:50%; width:1px; height:10px; background:var(--border); transform:translateY(-50%); }
+  .tick span{ font-size:10px; color:var(--muted); }
+  @keyframes scrollTrack{ 0%{ transform:translateX(0);} 100%{ transform:translateX(-50%);} }
+
+  /* ---------- SECTION SHARED ---------- */
+  section{ padding:140px 48px; max-width:1400px; margin:0 auto; }
+  .section-head{ display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:64px; flex-wrap:wrap; gap:24px; }
+  .eyebrow{
+    font-size:12px; color:var(--orange); letter-spacing:2px; text-transform:uppercase; margin-bottom:14px; display:block;
+    font-family:'JetBrains Mono', monospace;
+  }
+  .section-head h2{ font-size:clamp(32px,4.5vw,54px); letter-spacing:-1px; font-weight:600; }
+  .section-desc{ color:var(--muted); max-width:380px; font-size:15px; line-height:1.6; }
+
+  /* ---------- PORTFOLIO ---------- */
+  .filters{ display:flex; gap:10px; margin-bottom:48px; flex-wrap:wrap; }
+  .filter-btn{
+    padding:9px 20px; border:1px solid var(--border); border-radius:100px; font-size:13px; color:var(--muted);
+    transition:all .2s;
+  }
+  .filter-btn.active, .filter-btn:hover{ border-color:var(--text); color:var(--text); }
+
+  .grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(340px,1fr)); gap:28px;
+  }
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden;
+    cursor:pointer; transition:transform .3s, border-color .3s;
+    display:none;
+  }
+  .card.show{ display:block; }
+  .card:hover{ transform:translateY(-6px); border-color:var(--orange); }
+
+  .thumb{
+    position:relative; aspect-ratio:9/12; overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .thumb-bg{ position:absolute; inset:0; }
+  .thumb .play-icon{
+    position:relative; z-index:2; width:56px; height:56px; border-radius:50%;
+    background:rgba(10,10,11,0.55); backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    border:1px solid rgba(255,255,255,0.25);
+    transition:transform .3s, background .3s;
+  }
+  .card:hover .play-icon{ transform:scale(1.12); background:var(--orange); }
+  .play-icon svg{ width:18px; height:18px; }
+
+  .thumb-tag{
+    position:absolute; top:14px; left:14px; z-index:2;
+    font-size:10px; font-family:'JetBrains Mono',monospace; letter-spacing:1px;
+    background:rgba(10,10,11,0.6); backdrop-filter:blur(6px);
+    padding:5px 10px; border-radius:100px; border:1px solid rgba(255,255,255,0.15);
+  }
+  .thumb-duration{
+    position:absolute; bottom:14px; right:14px; z-index:2; font-size:11px;
+    font-family:'JetBrains Mono',monospace; background:rgba(10,10,11,0.6);
+    padding:4px 8px; border-radius:4px;
+  }
+
+  .card-info{ padding:18px 20px 22px; }
+  .card-info h3{ font-size:16px; font-weight:600; margin-bottom:6px; }
+  .card-info p{ font-size:13px; color:var(--muted); }
+
+  /* ---------- ABOUT ---------- */
+  .about-grid{ display:grid; grid-template-columns:0.8fr 1.2fr; gap:64px; align-items:center; }
+  .about-visual{
+    aspect-ratio:4/5; border-radius:20px; position:relative; overflow:hidden;
+    background:linear-gradient(160deg, var(--surface-2), var(--surface));
+    border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .about-visual::before{
+    content:''; position:absolute; width:220%; height:220%;
+    background:conic-gradient(from 0deg, transparent, rgba(255,106,57,0.15), transparent 30%, rgba(45,224,196,0.12), transparent 60%);
+    animation:spin 14s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .about-visual .initials{ font-size:88px; font-weight:700; z-index:1; -webkit-text-stroke:1px var(--text); color:transparent; }
+
+  .about-text h3{ font-size:28px; margin-bottom:20px; font-weight:600; }
+  .about-text p{ color:var(--muted); line-height:1.8; font-size:15.5px; margin-bottom:16px; max-width:560px; }
+
+  .tools{ margin-top:36px; display:flex; flex-wrap:wrap; gap:10px; }
+  .tool-pill{
+    font-size:12.5px; padding:8px 16px; border:1px solid var(--border); border-radius:100px; color:var(--muted);
+    font-family:'JetBrains Mono', monospace;
+  }
+
+  /* ---------- SERVICES ---------- */
+  .services-list{ border-top:1px solid var(--border); }
+  .service-row{
+    display:grid; grid-template-columns:60px 1fr 1fr 100px; align-items:center; gap:24px;
+    padding:32px 0; border-bottom:1px solid var(--border);
+    transition:padding-left .3s;
+  }
+  .service-row:hover{ padding-left:14px; }
+  .service-row:hover .service-name{ color:var(--orange); }
+  .service-num{ font-family:'JetBrains Mono',monospace; color:var(--muted); font-size:13px; }
+  .service-name{ font-size:22px; font-weight:600; transition:color .3s; }
+  .service-desc{ color:var(--muted); font-size:14px; line-height:1.6; }
+  .service-arrow{ text-align:right; color:var(--muted); font-size:20px; transition:transform .3s; }
+  .service-row:hover .service-arrow{ transform:translateX(6px); color:var(--teal); }
+
+  /* ---------- CONTACT ---------- */
+  .contact-wrap{
+    border-radius:24px; border:1px solid var(--border);
+    padding:80px 60px; text-align:center; position:relative; overflow:hidden;
+    background:var(--surface);
+  }
+  .contact-wrap h2{
+    font-size:clamp(32px,6vw,68px); font-weight:700; letter-spacing:-1.5px; margin-bottom:24px;
+  }
+  .contact-wrap .btn-primary{ margin-top:8px; }
+  .contact-meta{ margin-top:56px; display:flex; justify-content:center; gap:48px; flex-wrap:wrap; }
+  .contact-meta div{ text-align:left; }
+  .contact-meta .label{ font-size:11px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; font-family:'JetBrains Mono',monospace; }
+  .contact-meta a{ font-size:15px; }
+  .contact-meta a:hover{ color:var(--orange); }
+
+  footer{
+    padding:36px 48px; display:flex; justify-content:space-between; align-items:center;
+    border-top:1px solid var(--border); color:var(--muted); font-size:13px; flex-wrap:wrap; gap:12px;
+  }
+  footer .socials{ display:flex; gap:20px; }
+  footer .socials a:hover{ color:var(--text); }
+
+  /* ---------- LIGHTBOX ---------- */
+  .lightbox{
+    position:fixed; inset:0; background:rgba(6,6,7,0.92); backdrop-filter:blur(10px);
+    z-index:1000; display:none; align-items:center; justify-content:center; padding:40px;
+  }
+  .lightbox.open{ display:flex; }
+  .lightbox-inner{
+    max-width:420px; width:100%; background:var(--surface); border:1px solid var(--border); border-radius:20px; overflow:hidden;
+  }
+  .lightbox-video{ aspect-ratio:9/16; background:var(--surface-2); display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:13px; text-align:center; padding:20px; }
+  .lightbox-info{ padding:22px 24px; }
+  .lightbox-info h3{ font-size:19px; margin-bottom:8px; }
+  .lightbox-info p{ color:var(--muted); font-size:13.5px; margin-bottom:18px; }
+  .lightbox-close{
+    position:absolute; top:28px; right:40px; font-size:28px; color:var(--text); z-index:1001;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:860px){
+    nav{ padding:18px 22px; }
+    .nav-links{ display:none; }
+    section{ padding:90px 22px; }
+    .hero{ padding:120px 22px 60px; }
+    .about-grid{ grid-template-columns:1fr; }
+    .service-row{ grid-template-columns:40px 1fr; row-gap:8px; }
+    .service-desc{ grid-column:2/3; }
+    .service-arrow{ display:none; }
+    .contact-wrap{ padding:50px 24px; }
+    .contact-meta{ gap:28px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+
+  :focus-visible{ outline:2px solid var(--orange); outline-offset:3px; }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<nav>
+  <div class="logo">SAHIB VIRK<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#work">Work</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Let's talk</a>
+</nav>
+
+<!-- ---------- HERO ---------- -->
+<div class="hero">
+  <div class="timecode-bar mono">
+    <span class="rec-dot"></span>
+    <span>AVAILABLE FOR PROJECTS</span>
+  </div>
+  <h1>
+    Cutting stories<br>
+    that feel <span class="accent">alive.</span><br>
+    <span class="outline">Frame by frame.</span>
+  </h1>
+  <p class="hero-sub">
+    I'm Sahib Virk — a video editor and motion designer crafting documentary-style
+    reels and brand-grade motion graphics for Instagram, built to stop the scroll.
+  </p>
+  <div class="hero-actions">
+    <a href="#work" class="btn-primary">
+      View Work
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a href="#contact" class="btn-outline">Start a Project</a>
+  </div>
+
+  <div class="scrubber">
+    <div class="scrubber-track mono" id="scrubberTrack"></div>
+  </div>
+</div>
+
+<!-- ---------- PORTFOLIO ---------- -->
+<section id="work">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">Selected Work</span>
+      <h2>Recent edits</h2>
+    </div>
+    <p class="section-desc">A mix of documentary-style storytelling, brand motion graphics, and short-form reels — swap in your own clips below.</p>
+  </div>
+
+  <div class="filters mono" id="filters">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="documentary">Documentary</button>
+    <button class="filter-btn" data-filter="motion">Motion Graphics</button>
+    <button class="filter-btn" data-filter="reels">Reels</button>
+    <button class="filter-btn" data-filter="commercial">Commercial</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+</section>
+
+<!-- ---------- ABOUT ---------- -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-visual">
+      <span class="initials">SV</span>
+    </div>
+    <div class="about-text">
+      <span class="eyebrow">About</span>
+      <h3>Editor first. Motion designer, always learning.</h3>
+      <p>I started as a video editor working across every format — from fast-paced
+      reels to long-form documentary cuts — and I've spent the last stretch pushing
+      into motion graphics, studying brand-level animation to bring that same polish
+      into short-form content.</p>
+      <p>Every edit is built around pacing, rhythm, and a clear story — whether that's
+      a 15-second reel or a longer narrative piece. I edit primarily in DaVinci Resolve,
+      with motion work built in After Effects.</p>
+      <div class="tools">
+        <span class="tool-pill">DaVinci Resolve</span>
+        <span class="tool-pill">After Effects</span>
+        <span class="tool-pill">Premiere Pro</span>
+        <span class="tool-pill">Color Grading</span>
+        <span class="tool-pill">Sound Design</span>
+        <span class="tool-pill">Motion Graphics</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ---------- SERVICES ---------- -->
+<section id="services">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">Services</span>
+      <h2>What I do</h2>
+    </div>
+    <p class="section-desc">From raw footage to a finished, brand-ready cut.</p>
+  </div>
+
+  <div class="services-list mono">
+    <div class="service-row">
+      <span class="service-num">01</span>
+      <span class="service-name">Reels Editing</span>
+      <span class="service-desc">Fast-paced, scroll-stopping short-form edits built for retention and reach.</span>
+      <span class="service-arrow">→</span>
+    </div>
+    <div class="service-row">
+      <span class="service-num">02</span>
+      <span class="service-name">Motion Graphics</span>
+      <span class="service-desc">Clean, brand-level animated text, transitions, and visual explainers.</span>
+      <span class="service-arrow">→</span>
+    </div>
+    <div class="service-row">
+      <span class="service-num">03</span>
+      <span class="service-name">Documentary Editing</span>
+      <span class="service-desc">Narrative-driven long-form cuts with careful pacing and sound design.</span>
+      <span class="service-arrow">→</span>
+    </div>
+    <div class="service-row">
+      <span class="service-num">04</span>
+      <span class="service-name">Color Grading</span>
+      <span class="service-desc">Mood-driven color work to give every project a distinct visual identity.</span>
+      <span class="service-arrow">→</span>
+    </div>
+  </div>
+</section>
+
+<!-- ---------- CONTACT ---------- -->
+<section id="contact">
+  <div class="contact-wrap">
+    <span class="eyebrow">Get in touch</span>
+    <h2>Let's cut<br>something great.</h2>
+    <a href="mailto:thefreeeditor7@gmail.com" class="btn-primary">
+      Start a Project
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <div class="contact-meta">
+      <div>
+        <div class="label">Email</div>
+        <a href="mailto:thefreeeditor7@gmail.com">thefreeeditor7@gmail.com</a>
+      </div>
+      <div>
+        <div class="label">WhatsApp</div>
+        <a href="https://wa.me/917206625319" target="_blank" rel="noopener">+91 72066 25319</a>
+      </div>
+      <div>
+        <div class="label">Based in</div>
+        <a href="#">India (IST)</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 Sahib Virk. All edits reserved.</span>
+  <div class="socials mono">
+    <a href="https://wa.me/917206625319" target="_blank" rel="noopener">WhatsApp</a>
+    <a href="mailto:thefreeeditor7@gmail.com">Email</a>
+  </div>
+</footer>
+
+<!-- ---------- LIGHTBOX ---------- -->
+<div class="lightbox" id="lightbox">
+  <span class="lightbox-close" id="lightboxClose">&times;</span>
+  <div class="lightbox-inner">
+    <div class="lightbox-video" id="lightboxVideo"></div>
+    <div class="lightbox-info">
+      <h3 id="lightboxTitle"></h3>
+      <p id="lightboxDesc"></p>
+      <a href="#" target="_blank" rel="noopener" class="btn-outline" id="lightboxLink" style="display:inline-block;">View on Instagram</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* =========================================================
+     EDIT YOUR PROJECTS HERE
+     - thumbGradient: any CSS gradient/color for the placeholder tile
+     - videoSrc: set to your own hosted .mp4 URL to replace the placeholder
+     - link: your Instagram Reel / YouTube link
+     ========================================================= */
+  const projects = [
+    {
+      title: "The Strategy Trap",
+      category: "motion",
+      tag: "Motion Graphics",
+      duration: "0:42",
+      desc: "Why businesses fail from poor strategy, not poor products — kinetic typography reel.",
+      thumbGradient: "linear-gradient(160deg,#ff6a39,#141416 70%)",
+      videoSrc: "videos/Business.mp4",
+      link: "https://instagram.com"
+    },
+    {
+      title: "Life on the Ghats",
+      category: "documentary",
+      tag: "Documentary",
+      duration: "2:15",
+      desc: "A quiet morning documentary piece shot along the river, cut for pacing and mood.",
+      thumbGradient: "linear-gradient(160deg,#2de0c4,#141416 70%)",
+      videoSrc: "",
+      link: "https://instagram.com"
+    },
+    {
+      title: "Street Food Diaries",
+      category: "reels",
+      tag: "Reels",
+      duration: "0:28",
+      desc: "Fast-cut street food reel built for retention and shareability.",
+      thumbGradient: "linear-gradient(160deg,#ffb23f,#141416 70%)",
+      videoSrc: "",
+      link: "https://instagram.com"
+    },
+    {
+      title: "Studio Launch Promo",
+      category: "commercial",
+      tag: "Commercial",
+      duration: "1:02",
+      desc: "Brand promo edit combining product shots with animated overlays.",
+      thumbGradient: "linear-gradient(160deg,#7a7aff,#141416 70%)",
+      videoSrc: "",
+      link: "https://instagram.com"
+    },
+    {
+      title: "Mountain Silence",
+      category: "documentary",
+      tag: "Documentary",
+      duration: "3:04",
+      desc: "A slow, contemplative documentary cut exploring solitude in the Himalayas.",
+      thumbGradient: "linear-gradient(160deg,#2de0c4,#0a0a0b 70%)",
+      videoSrc: "",
+      link: "https://instagram.com"
+    },
+    {
+      title: "Type in Motion",
+      category: "motion",
+      tag: "Motion Graphics",
+      duration: "0:35",
+      desc: "Experimental kinetic type study exploring rhythm and timing.",
+      thumbGradient: "linear-gradient(160deg,#ff6a39,#0a0a0b 70%)",
+      videoSrc: "",
+      link: "https://instagram.com"
+    }
+  ];
+
+  const grid = document.getElementById('grid');
+
+  function playIconSVG(){
+    return `<svg viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5z" fill="white"/></svg>`;
+  }
+
+  projects.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'card show';
+    card.dataset.category = p.category;
+    card.innerHTML = `
+      <div class="thumb">
+        <div class="thumb-bg" style="position:absolute;inset:0;background:${p.thumbGradient}"></div>
+        <span class="thumb-tag mono">${p.tag}</span>
+        <span class="thumb-duration mono">${p.duration}</span>
+        <div class="play-icon">${playIconSVG()}</div>
+      </div>
+      <div class="card-info">
+        <h3>${p.title}</h3>
+        <p>${p.desc}</p>
+      </div>
+    `;
+    card.addEventListener('click', () => openLightbox(p));
+    grid.appendChild(card);
+  });
+
+  // Filters
+  document.getElementById('filters').addEventListener('click', (e) => {
+    if(!e.target.classList.contains('filter-btn')) return;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    const f = e.target.dataset.filter;
+    document.querySelectorAll('.card').forEach(c => {
+      c.classList.toggle('show', f === 'all' || c.dataset.category === f);
+    });
+  });
+
+  // Lightbox
+  const lightbox = document.getElementById('lightbox');
+  const lightboxVideo = document.getElementById('lightboxVideo');
+  const lightboxTitle = document.getElementById('lightboxTitle');
+  const lightboxDesc = document.getElementById('lightboxDesc');
+  const lightboxLink = document.getElementById('lightboxLink');
+
+  function openLightbox(p){
+    lightboxTitle.textContent = p.title;
+    lightboxDesc.textContent = p.desc;
+    lightboxLink.href = p.link;
+    if(p.videoSrc){
+      lightboxVideo.innerHTML = `<video src="${p.videoSrc}" controls autoplay style="width:100%;height:100%;object-fit:cover;"></video>`;
+    } else {
+      lightboxVideo.style.background = p.thumbGradient;
+      lightboxVideo.innerHTML = `Replace "videoSrc" in the code with your video file link to preview it here.`;
+    }
+    lightbox.classList.add('open');
+  }
+  document.getElementById('lightboxClose').addEventListener('click', () => {
+    lightbox.classList.remove('open');
+    lightboxVideo.innerHTML = '';
+  });
+  lightbox.addEventListener('click', (e) => {
+    if(e.target === lightbox){
+      lightbox.classList.remove('open');
+      lightboxVideo.innerHTML = '';
+    }
+  });
+
+  // Scrubber ticks
+  const track = document.getElementById('scrubberTrack');
+  let ticks = '';
+  for(let i=0;i<40;i++){
+    const t = i*2;
+    const mm = String(Math.floor(t/60)).padStart(2,'0');
+    const ss = String(t%60).padStart(2,'0');
+    ticks += `<div class="tick"><span>${mm}:${ss}</span></div>`;
+  }
+  track.innerHTML = ticks + ticks; // duplicate for seamless loop
+</script>
+
+</body>
+</html>
