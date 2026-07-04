@@ -157,6 +157,9 @@
     display:flex; align-items:center; justify-content:center;
   }
   .thumb-bg{ position:absolute; inset:0; }
+  .thumb-video{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1;
+  }
   .thumb .play-icon{
     position:relative; z-index:2; width:56px; height:56px; border-radius:50%;
     background:rgba(10,10,11,0.55); backdrop-filter:blur(6px);
@@ -464,8 +467,9 @@
 <script>
   /* =========================================================
      EDIT YOUR PROJECTS HERE
-     - thumbGradient: any CSS gradient/color for the placeholder tile
-     - videoSrc: set to your own hosted .mp4 URL to replace the placeholder
+     - thumbGradient: any CSS gradient/color for the placeholder tile (used if no poster/video)
+     - poster: path to a thumbnail image (e.g. "thumbnails/business.jpg") — shows instantly, before the video loads
+     - videoSrc: your video file link (e.g. "videos/business.mp4")
      - link: your Instagram Reel / YouTube link
      ========================================================= */
   const projects = [
@@ -476,6 +480,7 @@
       duration: "0:42",
       desc: "Why businesses fail from poor strategy, not poor products — kinetic typography reel.",
       thumbGradient: "linear-gradient(160deg,#ff6a39,#141416 70%)",
+      poster: "thumbnails/Business.jpg",
       videoSrc: "videos/Business.mp4",
       link: "https://instagram.com"
     },
@@ -486,6 +491,7 @@
       duration: "2:15",
       desc: "A quiet morning documentary piece shot along the river, cut for pacing and mood.",
       thumbGradient: "linear-gradient(160deg,#2de0c4,#141416 70%)",
+      poster: "",
       videoSrc: "",
       link: "https://instagram.com"
     },
@@ -496,6 +502,7 @@
       duration: "0:28",
       desc: "Fast-cut street food reel built for retention and shareability.",
       thumbGradient: "linear-gradient(160deg,#ffb23f,#141416 70%)",
+      poster: "",
       videoSrc: "",
       link: "https://instagram.com"
     },
@@ -506,6 +513,7 @@
       duration: "1:02",
       desc: "Brand promo edit combining product shots with animated overlays.",
       thumbGradient: "linear-gradient(160deg,#7a7aff,#141416 70%)",
+      poster: "",
       videoSrc: "",
       link: "https://instagram.com"
     },
@@ -516,6 +524,7 @@
       duration: "3:04",
       desc: "A slow, contemplative documentary cut exploring solitude in the Himalayas.",
       thumbGradient: "linear-gradient(160deg,#2de0c4,#0a0a0b 70%)",
+      poster: "",
       videoSrc: "",
       link: "https://instagram.com"
     },
@@ -526,6 +535,7 @@
       duration: "0:35",
       desc: "Experimental kinetic type study exploring rhythm and timing.",
       thumbGradient: "linear-gradient(160deg,#ff6a39,#0a0a0b 70%)",
+      poster: "",
       videoSrc: "",
       link: "https://instagram.com"
     }
@@ -541,9 +551,17 @@
     const card = document.createElement('div');
     card.className = 'card show';
     card.dataset.category = p.category;
+    const videoTag = p.videoSrc
+      ? `<video class="thumb-video" src="${p.videoSrc}" ${p.poster ? `poster="${p.poster}"` : ''} autoplay muted loop playsinline preload="metadata"></video>`
+      : '';
+    const thumbImg = (!p.videoSrc && p.poster)
+      ? `<img class="thumb-video" src="${p.poster}" alt="${p.title}">`
+      : '';
     card.innerHTML = `
       <div class="thumb">
         <div class="thumb-bg" style="position:absolute;inset:0;background:${p.thumbGradient}"></div>
+        ${thumbImg}
+        ${videoTag}
         <span class="thumb-tag mono">${p.tag}</span>
         <span class="thumb-duration mono">${p.duration}</span>
         <div class="play-icon">${playIconSVG()}</div>
