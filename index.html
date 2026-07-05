@@ -315,7 +315,7 @@
   </h1>
   <p class="hero-sub">
     I'm Sahib Virk — a video editor and motion designer crafting documentary-style
-    reels and brand-grade motion graphics for Instagram,Youtube, built to stop the scroll.
+    reels and brand-grade motion graphics for Instagram, built to stop the scroll.
   </p>
   <div class="hero-actions">
     <a href="#work" class="btn-primary">
@@ -466,11 +466,14 @@
 
 <script>
   /* =========================================================
-     EDIT YOUR PROJECTS HERE
-     - thumbGradient: any CSS gradient/color for the placeholder tile (used if no poster/video)
-     - poster: path to a thumbnail image (e.g. "thumbnails/business.jpg") — shows instantly, before the video loads
+     EDIT YOUR PROJECTS HERE — only real, finished videos should be listed.
+     - thumbGradient: backup color shown only if poster/video haven't loaded yet
+     - poster: path to a thumbnail image (e.g. "thumbnails/business.jpg")
      - videoSrc: your video file link (e.g. "videos/business.mp4")
      - link: your Instagram Reel / YouTube link
+
+     TO ADD A NEW PROJECT: copy one whole { ... } block below, paste it
+     as a new entry, and fill in your own details.
      ========================================================= */
   const projects = [
     {
@@ -480,63 +483,19 @@
       duration: "0:42",
       desc: "Why businesses fail from poor strategy, not poor products — kinetic typography reel.",
       thumbGradient: "linear-gradient(160deg,#ff6a39,#141416 70%)",
-      poster: "thumbnails/Business.jpg",
+      poster: "",
       videoSrc: "videos/Business.mp4",
       link: "https://instagram.com"
     },
     {
-      title: "Life on the Ghats",
-      category: "documentary",
-      tag: "Documentary",
-      duration: "2:15",
-      desc: "A quiet morning documentary piece shot along the river, cut for pacing and mood.",
-      thumbGradient: "linear-gradient(160deg,#2de0c4,#141416 70%)",
-      poster: "",
-      videoSrc: "",
-      link: "https://instagram.com"
-    },
-    {
-      title: "Street Food Diaries",
+      title: "Rewiring the Mind",
       category: "reels",
       tag: "Reels",
-      duration: "0:28",
-      desc: "Fast-cut street food reel built for retention and shareability.",
-      thumbGradient: "linear-gradient(160deg,#ffb23f,#141416 70%)",
-      poster: "",
-      videoSrc: "",
-      link: "https://instagram.com"
-    },
-    {
-      title: "Studio Launch Promo",
-      category: "commercial",
-      tag: "Commercial",
-      duration: "1:02",
-      desc: "Brand promo edit combining product shots with animated overlays.",
-      thumbGradient: "linear-gradient(160deg,#7a7aff,#141416 70%)",
-      poster: "",
-      videoSrc: "",
-      link: "https://instagram.com"
-    },
-    {
-      title: "Mountain Silence",
-      category: "documentary",
-      tag: "Documentary",
-      duration: "3:04",
-      desc: "A slow, contemplative documentary cut exploring solitude in the Himalayas.",
-      thumbGradient: "linear-gradient(160deg,#2de0c4,#0a0a0b 70%)",
-      poster: "",
-      videoSrc: "",
-      link: "https://instagram.com"
-    },
-    {
-      title: "Type in Motion",
-      category: "motion",
-      tag: "Motion Graphics",
-      duration: "0:35",
-      desc: "Experimental kinetic type study exploring rhythm and timing.",
-      thumbGradient: "linear-gradient(160deg,#ff6a39,#0a0a0b 70%)",
-      poster: "",
-      videoSrc: "",
+      duration: "0:30",
+      desc: "A short-form reel exploring neuroplasticity — how the brain adapts and rewires itself.",
+      thumbGradient: "linear-gradient(160deg,#2de0c4,#141416 70%)",
+      poster: "thumbnails/Neuroplasticity.jpg",
+      videoSrc: "videos/Neuroplasticity.mp4",
       link: "https://instagram.com"
     }
   ];
