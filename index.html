@@ -119,6 +119,12 @@
     transition:border-color .2s;
   }
   .btn-outline:hover{ border-color:var(--teal); color:var(--teal); }
+  .btn-product{
+    border:1px solid rgba(78,168,222,0.4); padding:14px 28px; border-radius:100px;
+    font-size:14px; font-weight:500; color:var(--orange); background:rgba(78,168,222,0.06);
+    transition:all .2s; display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-product:hover{ background:rgba(78,168,222,0.14); border-color:var(--orange); transform:translateY(-2px); }
 
   /* Scrubber timeline decoration */
   .scrubber{
@@ -236,6 +242,52 @@
   .service-arrow{ text-align:right; color:var(--muted); font-size:20px; transition:transform .3s; }
   .service-row:hover .service-arrow{ transform:translateX(6px); color:var(--teal); }
 
+  /* ---------- STORE ---------- */
+  .store-card{
+    display:grid; grid-template-columns:1fr 1fr; gap:0;
+    border:1px solid var(--border); border-radius:20px; overflow:hidden;
+    background:var(--surface);
+  }
+  .store-card:hover{ border-color:var(--orange); }
+  .store-visual{
+    position:relative; padding:48px; display:flex; flex-direction:column; justify-content:center;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 20%, rgba(78,168,222,0.14), transparent 60%),
+      var(--surface-2);
+    border-right:1px solid var(--border);
+  }
+  .store-tag{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:1px; color:var(--orange); border:1px solid rgba(78,168,222,0.35);
+    padding:5px 12px; border-radius:100px; margin-bottom:20px; width:fit-content;
+  }
+  .store-visual h3{ font-size:26px; font-weight:600; margin-bottom:14px; line-height:1.25; }
+  .store-visual p{ color:var(--muted); font-size:14.5px; line-height:1.7; }
+  .store-body{ padding:48px; display:flex; flex-direction:column; }
+  .store-features{ margin-bottom:32px; }
+  .store-features li{
+    display:flex; align-items:flex-start; gap:10px; font-size:14px; color:var(--text);
+    padding:11px 0; border-bottom:1px solid var(--border);
+  }
+  .store-features li:first-child{ padding-top:0; }
+  .store-features li::before{
+    content:'✓'; color:var(--orange); font-weight:700; flex-shrink:0;
+  }
+  .store-price-row{
+    display:flex; align-items:baseline; gap:10px; margin-bottom:24px;
+  }
+  .store-price{ font-family:'Space Grotesk',sans-serif; font-size:36px; font-weight:700; }
+  .store-price-note{ font-size:13px; color:var(--muted); }
+  .store-buy-note{ margin-top:16px; font-size:12.5px; color:var(--muted); }
+  .store-buy-note a{ color:var(--teal); }
+  .store-buy-note a:hover{ color:var(--orange); }
+
+  @media (max-width:860px){
+    .store-card{ grid-template-columns:1fr; }
+    .store-visual{ border-right:none; border-bottom:1px solid var(--border); padding:36px 24px; }
+    .store-body{ padding:36px 24px; }
+  }
+
   /* ---------- CONTACT ---------- */
   .contact-wrap{
     border-radius:24px; border:1px solid var(--border);
@@ -307,6 +359,7 @@
     <li><a href="#work">Work</a></li>
     <li><a href="#about">About</a></li>
     <li><a href="#services">Services</a></li>
+    <li><a href="#store">Store</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
   <a href="#contact" class="nav-cta">Let's talk</a>
@@ -333,6 +386,9 @@
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
     <a href="#contact" class="btn-outline">Start a Project</a>
+    <a href="#store" class="btn-product">
+      🎬 Get AutoCaptions
+    </a>
   </div>
 
   <div class="scrubber">
@@ -423,6 +479,47 @@
       <span class="service-name">Color Grading</span>
       <span class="service-desc">Mood-driven color work to give every project a distinct visual identity.</span>
       <span class="service-arrow">→</span>
+    </div>
+  </div>
+</section>
+
+<!-- ---------- STORE ---------- -->
+<section id="store">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">Tools I Built</span>
+      <h2>Editor tools,<br>for editors.</h2>
+    </div>
+    <p class="section-desc">Scripts I built for my own editing workflow, cleaned up so you can use them too.</p>
+  </div>
+
+  <div class="store-card">
+    <div class="store-visual">
+      <span class="store-tag mono">DAVINCI RESOLVE</span>
+      <h3>AutoCaptions for Resolve</h3>
+      <p>Transcribes your footage locally and inserts real, native Text+ caption
+      titles onto your timeline — timed to your speech. Not burned-in subtitles.
+      Click any caption after it's inserted, retype it, drag it, style it — just
+      like you made it by hand.</p>
+    </div>
+    <div class="store-body">
+      <ul class="store-features mono">
+        <li>Works with DaVinci Resolve — Free or Studio</li>
+        <li>Runs 100% locally — nothing uploaded anywhere</li>
+        <li>Native Text+ titles, fully editable after insert</li>
+        <li>Adjustable font, size, color, and position</li>
+        <li>Setup guide + email support included</li>
+      </ul>
+      <div class="store-price-row">
+        <span class="store-price">₹499</span>
+        <span class="store-price-note">one-time · lifetime use</span>
+      </div>
+      <a href="https://REPLACE-WITH-YOUR-GUMROAD-LINK.gumroad.com/l/autocaptions"
+         target="_blank" rel="noopener" class="btn-primary">
+        Get AutoCaptions
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <p class="store-buy-note">Questions before buying? <a href="https://wa.me/917206625319" target="_blank" rel="noopener">Message me on WhatsApp</a>.</p>
     </div>
   </div>
 </section>
